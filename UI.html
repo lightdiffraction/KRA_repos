@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        
+        .section h2 {
+            margin-top: 0;
+            color: #555;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button.danger {
+            background-color: #f44336;
+        }
+        
+        button.danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error {
+            color: #d32f2f;
+            background-color: #fde7e9;
+            border: 1px solid #f5c2c7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            color: #0f5132;
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Service Dashboard</h1>
+        
+        <!-- Get Category Section -->
+        <div class="section">
+            <h2>Get Category by ID</h2>
+            <div class="input-group">
+                <label for="categoryId">Category ID:</label>
+                <input type="text" id="categoryId" placeholder="Enter category ID">
+            </div>
+            <button onclick="getCategory()">Get Category</button>
+            <div id="categoryResult" class="result" style="display: none;">
+                <div class="result-header">
+                    <span><strong>Result:</strong></span>
+                    <button onclick="clearResult('categoryResult')">Clear</button>
+                </div>
+                <div id="categoryContent"></div>
+            </div>
+        </div>
+        
+        <!-- Get Page Section -->
+        <div class="section">
+            <h2>Get Page by ID</h2>
+            <div class="input-group">
+                <label for="pageId">Page ID:</label>
+                <input type="text" id="pageId" placeholder="Enter page ID">
+            </div>
+            <button onclick="getPage()">Get Page</button>
+            <div id="pageResult" class="result" style="display: none;">
+                <div class="result-header">
+                    <span><strong>Result:</strong></span>
+                    <button onclick="clearResult('pageResult')">Clear</button>
+                </div>
+                <div id="pageContent"></div>
+            </div>
+        </div>
+        
+        <!-- Page Stats Section -->
+        <div class="section">
+            <h2>Page Statistics</h2>
+            <p>Get overall statistics about pages</p>
+            <button onclick="getPageStats()">Get Stats</button>
+            <div id="statsResult" class="result" style="display: none;">
+                <div class="result-header">
+                    <span><strong>Result:</strong></span>
+                    <button onclick="clearResult('statsResult')">Clear</button>
+                </div>
+                <div id="statsContent"></div>
+            </div>
+        </div>
+        
+        <!-- Update Views Section -->
+        <div class="section">
+            <h2>Update Page Views</h2>
+            <div class="input-group">
+                <label for="updatePageId">Page ID:</label>
+                <input type="text" id="updatePageId" placeholder="Enter page ID to update views">
+            </div>
+            <button onclick="updateViews()">Update Views</button>
+            <div id="updateResult" class="result" style="display: none;">
+                <div class="result-header">
+                    <span><strong>Result:</strong></span>
+                    <button onclick="clearResult('updateResult')">Clear</button>
+                </div>
+                <div id="updateContent"></div>
+            </div>
+        </div>
+        
+        <!-- Delete Page Section -->
+        <div class="section">
+            <h2>Delete Page</h2>
+            <div class="input-group">
+                <label for="deletePageId">Page ID:</label>
+                <input type="text" id="deletePageId" placeholder="Enter page ID to delete">
+            </div>
+            <button onclick="deletePage()" class="danger">Delete Page</button>
+            <div id="deleteResult" class="result" style="display: none;">
+                <div class="result-header">
+                    <span><strong>Result:</strong></span>
+                    <button onclick="clearResult('deleteResult')">Clear</button>
+                </div>
+                <div id="deleteContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // base URL for FastAPI service
+        const API_BASE_URL = 'http://localhost:8080';
+        
+        // helper function to show loading state
+        function showLoading(elementId) {
+            const contentDiv = document.getElementById(elementId);
+            contentDiv.innerHTML = '<div class="loading">Loading...</div>';
+            contentDiv.parentElement.style.display = 'block';
+        }
+        
+        function showResult(elementId, result, isError = false) {
+            const contentDiv = document.getElementById(elementId);
+            const resultDiv = document.getElementById(elementId.replace('Content', 'Result'));
+            
+            if (isError) {
+                contentDiv.innerHTML = `<div class="error">${result}</div>`;
+            } else {
+                // try to handle Unicode escape sequences
+                let formattedResult;
+                
+                if (typeof result === 'string') {
+                    try {
+                        if (result.trim().startsWith('{') || result.trim().startsWith('[')) {
+                            const parsed = JSON.parse(result);
+                            formattedResult = JSON.stringify(parsed, null, 2);
+                        } else {
+                            formattedResult = result;
+                        }
+                    } catch {
+                        formattedResult = result;
+                    }
+                } else if (typeof result === 'object') {
+                    // convert object to pretty JSON string
+                    formattedResult = JSON.stringify(result, null, 2);
+                } else {
+                    formattedResult = String(result);
+                }
+                
+                // create a temporary element to decode Unicode escapes
+                const tempDiv = document.createElement('div');
+                tempDiv.textContent = formattedResult;
+                const decodedText = tempDiv.innerHTML;
+                
+                contentDiv.innerHTML = `<pre>${decodedText}</pre>`;
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+        
+        // clear a result section
+        function clearResult(resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'none';
+        }
+        
+        // get Category by ID
+        async function getCategory() {
+            const categoryId = document.getElementById('categoryId').value;
+            if (!categoryId) {
+                alert('Please enter a category ID');
+                return;
+            }
+            
+            showLoading('categoryContent');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/categories/${categoryId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || `Error ${response.status}: ${response.statusText}`);
+                }
+                
+                showResult('categoryContent', data);
+            } catch (error) {
+                showResult('categoryContent', `Error: ${error.message}`, true);
+            }
+        }
+        
+        // get Page by ID
+        async function getPage() {
+            const pageId = document.getElementById('pageId').value;
+            if (!pageId) {
+                alert('Please enter a page ID');
+                return;
+            }
+            
+            showLoading('pageContent');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pages/${pageId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || `Error ${response.status}: ${response.statusText}`);
+                }
+                
+                showResult('pageContent', data);
+            } catch (error) {
+                showResult('pageContent', `Error: ${error.message}`, true);
+            }
+        }
+        
+        // get Page Statistics
+        async function getPageStats() {
+            showLoading('statsContent');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pages/stats`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || `Error ${response.status}: ${response.statusText}`);
+                }
+                
+                showResult('statsContent', data);
+            } catch (error) {
+                showResult('statsContent', `Error: ${error.message}`, true);
+            }
+        }
+        
+        // update Page Views
+        async function updateViews() {
+            const pageId = document.getElementById('updatePageId').value;
+            if (!pageId) {
+                alert('Please enter a page ID');
+                return;
+            }
+            
+            showLoading('updateContent');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pages/update_views/${pageId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || `Error ${response.status}: ${response.statusText}`);
+                }
+                
+                showResult('updateContent', data);
+            } catch (error) {
+                showResult('updateContent', `Error: ${error.message}`, true);
+            }
+        }
+        
+        // delete Page
+        async function deletePage() {
+            const pageId = document.getElementById('deletePageId').value;
+            if (!pageId) {
+                alert('Please enter a page ID');
+                return;
+            }
+            
+            // confirm deletion
+            if (!confirm(`Are you sure you want to delete page ${pageId}?`)) {
+                return;
+            }
+            
+            showLoading('deleteContent');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pages/delete/${pageId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || `Error ${response.status}: ${response.statusText}`);
+                }
+                
+                showResult('deleteContent', data);
+            } catch (error) {
+                showResult('deleteContent', `Error: ${error.message}`, true);
+            }
+        }
+        
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const section = this.closest('.section');
+                    const button = section.querySelector('button');
+                    if (button) {
+                        button.click();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
